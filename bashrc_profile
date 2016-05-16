@@ -1,0 +1,115 @@
+# copyright :  Andre' Lue (EON) All rights reserved
+# ident     :  @(#)bashrc  ver 1.0.12   c:12.08.04   m:05.16.16   ASL
+# signature :  Excuses are the tools of losers - ASL
+[ -z "$PS1" ] && return
+umask 022
+export p=/usr/local
+PATH=/usr/bin:/usr/sbin:${p}/bin:${p}/sbin:/usr/ccs/bin
+unset LD_LIBRARY_PATH
+LD_LIBRARY_PATH=${p}/lib:${p}/lib/amd64
+export PATH LD_LIBRARY_PATH
+#export TMOUT=300 # set 5 min auto-logout
+[ -d ${p}/share/man ] && export MANPATH=${p}/share/man
+[ -d ${p}/afp/bin ] && export PATH=$PATH:${p}/afp/bin:${p}/afp/sbin
+[ -d ${p}/dns/bin ] && export PATH=$PATH:${p}/dns/bin:${p}/dns/sbin
+[ -d ${p}/postfix/bin ] && export PATH=$PATH:${p}/postfix/bin:${p}/postfix/sbin:${p}/postfix/lib
+[ -d ${p}/apache/bin ] && export PATH=$PATH:${p}/apache/bin
+[ -d ${p}/light/sbin ] && export PATH=$PATH:${p}/light/sbin
+[ -d ${p}/nginx/sbin ] && export PATH=$PATH:${p}/nginx/sbin
+[ -d ${p}/node/bin ] && export PATH=$PATH:${p}/node/bin
+[ -d ${p}/mysql/bin ] && export PATH=$PATH:${p}/mysql/bin
+[ -d ${p}/php/bin ] && export PATH=$PATH:${p}/php/bin
+[ -d ${p}/python/bin ] && export PATH=$PATH:${p}/python/bin
+HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
+HISTCONTROL=ignoreboth
+HISTSIZE=1000
+HISTFILESIZE=2000
+#HISTTIMEFORMAT="%F %T "
+
+if [ "${TERM}" = "xterm-256color" ] ; then TERM=xterm ; fi
+if [ "${TERM}" != "dumb" ] ; then
+   #stty erase ''
+   #stty intr  ''
+   case `/bin/id -u` in
+   0) export PS1="\[\033[1;32m\]\h:\\#:\w\\$\[\033[0;38m\]";;
+   *) export PS1="\[\033[1;32m\]\h:\\#:\w>\[\033[0;38m\]";;
+   esac
+   # Term title
+   if [ "`/usr/bin/tty`" != "/dev/console" ] ; then
+      /bin/echo "\033]0;${USER}@`/usr/bin/hostname`\007\c"
+   fi
+fi
+
+# ulimit -S -c 0                   # no coredumps
+set -o notify                      # show background job notification
+set -o noclobber                   # no overwrites
+# shopt -s execfail
+shopt -s cdspell
+shopt -s checkhash
+shopt -s checkwinsize
+shopt -s histappend
+# shopt -s no_empty_cmd_completion
+alias c="clear"
+alias j="jobs -l $@"
+alias h="history $@"
+alias du="du $@"
+alias df="df $@"
+alias ls="ls -CF"
+# alias ls="ls --color=always"       # color ls
+alias ll="ls -al"
+alias lk="ls -lSr"                 # sort by inc size
+alias lr="ls -alR"                 # recursive ls
+alias lt="ls -alt"                 # sort by last modified
+alias m="more"
+# alias m="less -F"
+alias 555="chmod 555"
+alias 644="chmod 644"
+alias 755="chmod 755"
+alias zsp="zfs list -o space"
+alias bw="dladm show-link -s -i 1"
+alias t="tail"
+type wget > /dev/null 2>&1 || {
+if [ -x /mnt/eon0/bin/wget ] ; then
+   export PATH=$PATH:/mnt/eon0/bin
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/mnt/eon0/bin
+fi
+}
+
+if [ -f /mnt/eon0/.aliases ] ; then . /mnt/eon0/.aliases ; fi
+
+for s in ${p}/etc/bash/bashrc-* ; do
+   test -r ${s} && . ${s}
+done
+
+ds() { # directory size
+for i in G M K; do du -ad 1 $1 | grep "[0-9]$i" | sort -nr -k 1; done
+}
+
+xt() {
+msg="usage: xt file.tar.bz2"
+if [ -f "${1}" ] ; then
+   M=" unpacking: ${1} ... \c"
+   if [ -x ${p}/bin/gtar ] ; then TAR=gtar ; else TAR=tar ; fi
+   case "${1}" in
+   *.tar.bz2)     echo $M && (bzip2 -dc ${1} | $TAR -xf -) ;;
+   *.tar.gz)      echo $M && (gzip -dc ${1} | $TAR -xf -) ;;
+   *.bz2)         echo $M && bunzip2 ${1} ;;
+   *.rar)         echo $M && unrar x ${1} ;;
+   *.gz)          echo $M && gzip -d ${1} ;;
+   *.tar)         echo $M && $TAR -xf ${1} ;;
+   *.tbz)         echo $M && (bzip2 -dc ${1} | $TAR -xf -) ;;
+   *.tgz)         echo $M && (gzip -dc ${1} | $TAR -xf -) ;;
+   *.zip)         echo $M && unzip -a ${1} ;;
+   *.Z)           echo $M && uncompress ${1} ;;
+   *.7z)          echo $M && 7z x ${1} ;;
+   *.xz)          echo $M && (xz -dc ${1} | $TAR -xf -) ;;
+   *.setup)       sh ${1} ;;
+   *.eon)         echo $M && (gzip -dc ${1} | $TAR -xf -) ;;
+   *)             echo "$msg" ;;
+   esac
+   if [ "$?" = "0" ] ; then echo "done" ; else echo "failed" ; fi
+else
+   if [ "X${1}" = "X" ] ; then echo "$msg" ; fi
+fi
+}
+

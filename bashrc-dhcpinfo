@@ -1,0 +1,13 @@
+# copyright :  Andre' Lue (EON) All rights reserved
+# ident     :  @(#)bashrc-eon  ver 0.1.6   c:01.08.16   m:02.06.16   ASL
+# signature :  When that time comes, i'll be too busy looking good!
+# bash completion for dhcpinfo
+_FILE=/etc/dhcp/inittab
+
+_dhcpinfo() {
+  local cur=${COMP_WORDS[COMP_CWORD]}
+  local prev=${COMP_WORDS[COMP_CWORD-1]}
+
+  COMPREPLY=( $(compgen -W "$(egrep -v "^(#|$)" $_FILE | awk '{print $1}')" -- $cur) )
+}
+complete -F _dhcpinfo dhcpinfo

@@ -1,0 +1,32 @@
+# copyright :  Andre' Lue (EON) All rights reserved
+# ident     :  @(#)bashrc-svc  ver 0.1.6   c:01.08.16   m:05.16.16   ASL
+# signature :  If you want to glimpse the future, just look behind you.
+# bash completion for svcadm
+
+_svcadm() {
+  local cur=${COMP_WORDS[COMP_CWORD]}
+  local prev=${COMP_WORDS[COMP_CWORD-1]}
+
+case "$prev" in
+svcadm)
+  COMPREPLY=( $(compgen -W "-v enable disable restart refresh mark clear milestone" -- $cur) )
+  return 0
+  ;;
+-v)
+  COMPREPLY=( $(compgen -W "enable disable restart refresh mark clear milestone" -- $cur) )
+  return 0
+  ;;
+#enable|disable|restart|refresh|mark|clear)
+#  COMPREPLY=( $(compgen -W "-I -r -s -t -T" -- $cur) )
+#  return 0
+#  ;;
+milestone)
+  COMPREPLY=( $(compgen -W "-d -s -T all none" -- $cur) )
+  return 0
+  ;;
+esac
+
+  COMPREPLY=( $(compgen -W "$(svcs -a -o fmri -H | sed 's/svc:\///g;s/lrc:\///g')" -- $cur) )
+}
+complete -F _svcadm svcadm
+
