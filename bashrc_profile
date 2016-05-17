@@ -1,5 +1,5 @@
 # copyright :  Andre' Lue (EON) All rights reserved
-# ident     :  @(#)bashrc  ver 1.0.12   c:12.08.04   m:05.16.16   ASL
+# ident     :  @(#)bashrc  ver 1.0.12   c:12.08.04   m:05.17.16   ASL
 # signature :  Excuses are the tools of losers - ASL
 [ -z "$PS1" ] && return
 umask 022
@@ -8,7 +8,7 @@ PATH=/usr/bin:/usr/sbin:${p}/bin:${p}/sbin:/usr/ccs/bin
 unset LD_LIBRARY_PATH
 LD_LIBRARY_PATH=${p}/lib:${p}/lib/amd64
 export PATH LD_LIBRARY_PATH
-#export TMOUT=300 # set 5 min auto-logout
+#export TMOUT=300 # set 5 min inactivity auto-logout
 [ -d ${p}/share/man ] && export MANPATH=${p}/share/man
 [ -d ${p}/afp/bin ] && export PATH=$PATH:${p}/afp/bin:${p}/afp/sbin
 [ -d ${p}/dns/bin ] && export PATH=$PATH:${p}/dns/bin:${p}/dns/sbin
@@ -49,11 +49,12 @@ shopt -s checkhash
 shopt -s checkwinsize
 shopt -s histappend
 # shopt -s no_empty_cmd_completion
+alias ..="cd .."
 alias c="clear"
 alias j="jobs -l $@"
 alias h="history $@"
-alias du="du $@"
-alias df="df $@"
+alias duh="du -h $@"
+alias dfh="df -h $@"
 alias ls="ls -CF"
 # alias ls="ls --color=always"       # color ls
 alias ll="ls -al"
